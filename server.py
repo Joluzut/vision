@@ -1,4 +1,5 @@
-import socket
+import socket  #die nicla word de server
+import os
 HOST = '192.168.2.18'  # dit moet prive ip adress zijn. CMD ipconfig en kijken voor resultaat. Kan ook local host zijn
 PORT = 9090 # of andere port
 
@@ -14,3 +15,16 @@ while True:
     communitcation_socket.send("Message received".encode('utf-8'))
     communitcation_socket.close() # close the connection
     print(f"Connection with {address} closed")
+
+
+
+
+# voor versturen van een file
+# file = open("image.jpg", "rd") # open file in read mode
+# file_size= os.path.getsize("image.jpg") # get the size of the file
+# communitcation_socket.send("reciebed_imaga.png".encode()) # send the size of the file
+# communitcation_socket.send(str(file_size).encode()) # send the size of the file
+# data = file.read() # read the file
+# communitcation_socket.sendall(data) # send the file
+# communitcation_socket.send(b"<END>")
+# file.close() # close the file
