@@ -1,35 +1,37 @@
 import socket
 import tqdm
-HOST = '192.168.2.18'   #moet adderss zijn van de server op local network
+
+HOST = '192.168.1.100'  # Address of the server on the local network
 PORT = 9090
 
-socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-socket.connect((HOST, PORT))
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect((HOST, PORT))
 
-socket.send("Hello server".encode('utf-8'))
-print(socket.recv(1024).decode('utf-8'))    # 1024 is de buffer size
+client_socket.send("Hello server".encode('utf-8'))
+print(repr(client_socket.recv(1024).decode('utf-8')))  # Print with equivalent for \n
 
+file_name = client_socket.recv(1024).decode('utf-8')
+print(repr(file_name))  # Print with equivalent for \n
 
-file_name = socket.recv(1024).decode('utf-8')
-print(file_name)
-file_size = (socket.recv(1024).decode('utf-8'))
-print(file_size)
+file_size = client_socket.recv(1024).decode('utf-8')
+print(repr(file_size))  # Print with equivalent for \n
+
 file = open(file_name, "wb")
 
 file_bytes = b""
+
 done = False
 
-# file ontvangen
+progress = tqdm.tqdm(unit="B", unit_scale=True, unit_divisor=1000,
+                      total=int(file_size))
 
-# progress = tqdm.tqdm(unit="B", unit_scale=True, unit_divisor=1000,
-#                       total=int(file_size))
-# while not done:
-#     data = socket.recv(1024)
-#     if file_bytes[-5:] == b"<END>": # -5 is stel dat END in verschillende keren word over gestuurd
-#         done = True
-#     else:
-#         file_bytes += data
-#     progress.update(1024)
+while not done:
+    data = client_socket.recv(1024).decode('utf-8')
+    if(file_bytes[-5:] == b"<END>"):
+        done = True
+    else:
+        file_bytes += data
+    progress.update(1024)
 
-# file.write(file_bytes)
-# file.close()
+file.write(file_bytes)
+file.close()
