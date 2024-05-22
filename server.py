@@ -1,4 +1,4 @@
-import socket  #die nicla word de server
+import socket  #de nicla word de server
 import os
 import network
 import sensor, image, time
@@ -26,10 +26,6 @@ def do_connect():
     print('network config:', sta_if.ifconfig())
 do_connect()
 
-img = sensor.snapshot()
-img.rotation_corr(z_rotation=180)  # Rotate the image 180 degrees
-img.save("image.jpg")
-
 
 server = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
 server.bind((HOST, PORT))
@@ -41,16 +37,14 @@ while True:
     print (f"Connected to {address}")
     message = communitcation_socket.recv(1024).decode('utf-8') # 1024 is de buffer size
     print(f"Message from client: {message}")
-    communitcation_socket.send("Message received".encode('utf-8'))
-    clock.tick()
+#    communitcation_socket.send("Message received".encode('utf-8'))
+    img = sensor.snapshot()
+    img.rotation_corr(z_rotation=180)  # Rotate the image 180 degrees
+    compressed_img = img.compress(35)
+    communitcation_socket.send(compressed_img)
+    communitcation_socket.send(b'END_OF_IMAGE')
+
+
 
 #    # voor versturen van een file
-    file = open("image.jpg", "rd") # open file in read mode
-    file_size= os.stat("image.jpg")[6] # get the size of the file
-    print(f" file is:{file_size} bytes")
-    communitcation_socket.send("recieved_image.jpg".encode('utf-8')) # send the size of the file
-    communitcation_socket.send(str(file_size).encode('utf-8')) # send the size of the file
-    data = file.read() # read the file
-    communitcation_socket.sendall(data) # send the file
-    communitcation_socket.send(b"<END>")
-    file.close() # close the file
+

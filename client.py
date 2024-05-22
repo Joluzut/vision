@@ -1,5 +1,7 @@
 import socket
 import tqdm
+from PIL import Image
+import io
 
 HOST = '192.168.1.100'  # Address of the server on the local network
 PORT = 9090
@@ -8,30 +10,15 @@ client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((HOST, PORT))
 
 client_socket.send("Hello server".encode('utf-8'))
-print(repr(client_socket.recv(1024).decode('utf-8')))  # Print with equivalent for \n
 
-file_name = client_socket.recv(1024).decode('utf-8')
-print(repr(file_name))  # Print with equivalent for \n
+image_data = b""
+while True:
+    packet = client_socket.recv(1024)
+    if b'END_OF_IMAGE' in packet:  # Check if the end of image sequence is in the received packet
+        image_data += packet[:-len(b'END_OF_IMAGE')]  # Remove the end of image sequence from the image data
+        break
+    image_data += packet
 
-file_size = client_socket.recv(1024).decode('utf-8')
-print(repr(file_size))  # Print with equivalent for \n
-
-file = open(file_name, "wb")
-
-file_bytes = b""
-
-done = False
-
-progress = tqdm.tqdm(unit="B", unit_scale=True, unit_divisor=1000,
-                      total=int(file_size))
-
-while not done:
-    data = client_socket.recv(1024).decode('utf-8')
-    if(file_bytes[-5:] == b"<END>"):
-        done = True
-    else:
-        file_bytes += data
-    progress.update(1024)
-
-file.write(file_bytes)
-file.close()
+image = Image.open(io.BytesIO(image_data))
+image.save("received_image.jpg")  # Save the image as 'received_image.jpg'
+image.show()  # Display the image
