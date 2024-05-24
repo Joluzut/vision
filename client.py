@@ -3,7 +3,7 @@ import tqdm
 from PIL import Image
 import io
 
-HOST = '192.168.1.100'  # Address of the server on the local network
+HOST = '192.168.1.102'  # Address of the server on the local network
 PORT = 9090
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -19,6 +19,6 @@ while True:
         break
     image_data += packet
 
-image = Image.open(io.BytesIO(image_data))
+image = Image.open(io.BytesIO(image_data))# straks gan gewoon met image aan de s
 image.save("received_image.jpg")  # Save the image as 'received_image.jpg'
 image.show()  # Display the image

@@ -24,6 +24,15 @@ def do_connect():
         while not sta_if.isconnected():
             pass
     print('network config:', sta_if.ifconfig())
+
+def send_image():
+    img = sensor.snapshot()
+    img.rotation_corr(z_rotation=180)  # Rotate the image 180 degrees
+    compressed_img = img.compress(35)
+    communitcation_socket.send(compressed_img)
+    communitcation_socket.send(b'END_OF_IMAGE')
+
+
 do_connect()
 
 
@@ -38,12 +47,7 @@ while True:
     message = communitcation_socket.recv(1024).decode('utf-8') # 1024 is de buffer size
     print(f"Message from client: {message}")
 #    communitcation_socket.send("Message received".encode('utf-8'))
-    img = sensor.snapshot()
-    img.rotation_corr(z_rotation=180)  # Rotate the image 180 degrees
-    compressed_img = img.compress(35)
-    communitcation_socket.send(compressed_img)
-    communitcation_socket.send(b'END_OF_IMAGE')
-
+    send_image()
 
 
 #    # voor versturen van een file
