@@ -56,18 +56,20 @@ while True:
         elif message == 'disconnect':
             communitcation_socket.close()  # Close the socket when the client sends 'disconnect'
             break
+        else if message == 'left':
+            print(f"left")
+        else if message == 'right':
+            print(f"right")
+        else if message == 'straight':
+            print(f"straight")
+        else if message == 'green':
+            print(f"green")
+        else if message == 'orange':
+            print(f"orange")
+        else if message == 'red':
+            print(f"red")
 
 
-#    else if message == 'links':
 
-#    else if message == 'rechts':
-
-#    else if message == 'groen':
-
-#    else if message == 'orangje':
-
-#    else if message == 'rood':
-
-#    else if message == '':
 
 #    communitcation_socket.close()  # Ensure the socket is closed after the interaction
