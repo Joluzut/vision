@@ -4,7 +4,7 @@ import io
 import cv2
 import numpy as np
 
-HOST = '192.168.1.102'  # Address of the server on the local network
+HOST = '192.168.1.101'  # Address of the server on the local network
 PORT = 9090
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -26,13 +26,12 @@ def AskImage(client_socket):
 while True:
     image_data = AskImage(client_socket)
     image = Image.open(io.BytesIO(image_data))  # Open the image from the received data
-    # image.save("received_image.jpg")  # Save the image as 'received_image.jpg'
+    image.save("received_image.jpg")  # Save the image as 'received_image.jpg'
     # image.show()  # Display the image
-    import cv2
-
-    cropped_image = image[160:200, 0:320]
+    newimage = cv2.imread('recieved_image.jpg')
+    cropped_image = newimage[160:200, 0:320]
     # Convert the image to the HSV color space
-    hsv = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2HSV)
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     #hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     # Define the lower and upper bounds for the black color in HSV space

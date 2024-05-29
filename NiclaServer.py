@@ -8,7 +8,7 @@ toZumo = Pin("PA9", Pin.OUT_PP)
 
 
 # Configuration
-HOST = '192.168.1.102'  # This should be the private IP address of the Nicla
+HOST = '192.168.1.101'  # This should be the private IP address of the Nicla
 PORT = 9090  # or another port
 SSID = "ICIDU"
 KEY = "ICIDUAVANS"
@@ -73,29 +73,29 @@ while True:
         elif message == 'disconnect':
             communitcation_socket.close()  # Close the socket when the client sends 'disconnect'
             break
-        else if message == 'left':
+        elif message == 'left':
             print(f"left")
             imputcode= "00111111"
             check_zero_one(imputcode)
 
-        else if message == 'right':
+        elif message == 'right':
             print(f"right")
             imputcode= "01111111"
             check_zero_one(imputcode)
 
-        else if message == 'straight':
+        elif message == 'straight':
             print(f"straight")
             imputcode= "10111111"
             check_zero_one(imputcode)
 
-        else if message == 'green':
+        elif message == 'green':
             print(f"green")
             check_zero_one(message)
-        else if message == 'orange':
+        elif message == 'orange':
             print(f"orange")
             check_zero_one(message)
 
-        else if message == 'red':
+        elif message == 'red':
             print(f"red")
             check_zero_one(message)
 
