@@ -1,6 +1,8 @@
 import socket
 from PIL import Image
 import io
+import cv2
+import numpy as np
 
 HOST = '192.168.1.102'  # Address of the server on the local network
 PORT = 9090
@@ -26,3 +28,72 @@ while True:
     image = Image.open(io.BytesIO(image_data))  # Open the image from the received data
     # image.save("received_image.jpg")  # Save the image as 'received_image.jpg'
     # image.show()  # Display the image
+    import cv2
+
+    cropped_image = image[160:200, 0:320]
+    # Convert the image to the HSV color space
+    hsv = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2HSV)
+    #hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+    # Define the lower and upper bounds for the black color in HSV space
+    lower_black = np.array([0, 0, 0])
+    upper_black = np.array([190, 255, 80])
+
+    # Threshold the HSV image to get only black colors
+    mask = cv2.inRange(hsv, lower_black, upper_black)
+
+    dilate = cv2.dilate(mask, None, iterations=3)
+    erode = cv2.erode(dilate , None, iterations=2)
+    dilate1 = cv2.dilate(erode, None, iterations=3)
+    erode1 = cv2.erode(dilate1 , None, iterations=2)
+    dilate2 = cv2.dilate(erode1, None, iterations=3)
+    erode2 = cv2.erode(dilate2 , None, iterations=2)
+    #gray = cv2.cvtColor(erode2, cv2.COLOR_BGR2GRAY)
+    #blur = cv2.GaussianBlur(erode2, (5, 5), 0)
+    #edges = cv2.Canny(blur, 50, 150)
+    total = 0
+    sum = 0
+    middle = 0
+    constmiddle = 185
+    offset = 0
+    left = 0
+    right = 0 
+
+    for i in range(0, 320):  
+        for j in range(0, 40):
+            if erode2[j][i] == 255:
+                if i < 160:
+                    left += 1
+                else:
+                    right += 1
+                total += 1
+                sum += i
+            
+
+    middle = sum / total
+    offset = middle - constmiddle
+    print("totaal: " + str(total))
+    print("rechts: " + str(right))
+    print("links: " + str(left))
+    print("middel: " + str(middle))
+    print("offset: " + str(offset))
+    if offset < -14:
+        print("Turn left")
+        client_socket.send("left".encode('utf-8'))
+    elif offset > 14:
+        print("Turn right")
+        client_socket.send("right".encode('utf-8'))
+    else:
+        print("Go straight")
+        client_socket.send("straight".encode('utf-8'))
+
+
+    # Display the result
+    #cv2.imshow('cropped', cropped_image)
+    #cv2.imshow('og', image)
+    #cv2.imshow('erode2', erode)
+    #cv2.imshow('dilate2', dilate)
+    #cv2.imshow('mask', mask)
+    #cv2.imshow('edges', edges)
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
