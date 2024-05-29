@@ -57,7 +57,7 @@ while True:
     constmiddle = 185
     offset = 0
     left = 0
-    right = 0
+    right = 0 
 
     for i in range(0, 320):  
         for j in range(0, 40):
