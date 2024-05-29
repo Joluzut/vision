@@ -2,6 +2,10 @@ import socket  # The Nicla will be the server
 import os
 import network
 import sensor, image, time
+from machine import Pin
+
+toZumo = Pin("PA9", Pin.OUT_PP)
+
 
 # Configuration
 HOST = '192.168.1.102'  # This should be the private IP address of the Nicla
@@ -15,6 +19,16 @@ sensor.set_pixformat(sensor.RGB565)
 sensor.set_framesize(sensor.QVGA)
 sensor.skip_frames(time=2000)
 clock = time.clock()
+
+def check_zero_one(input_string):
+    toZumo.low()
+    for char in input_string:
+        time.sleep_us(500)
+        if char == '0':
+            toZumo.high()
+        else:
+            toZumo.low()
+
 
 def do_connect():
     sta_if = network.WLAN(network.STA_IF)
@@ -53,21 +67,38 @@ while True:
         if message == 'image':
             send_image(communitcation_socket)
             print(f"send image")
+            imputcode= "10"
+            check_zero_one(imputcode)
+
         elif message == 'disconnect':
             communitcation_socket.close()  # Close the socket when the client sends 'disconnect'
             break
         else if message == 'left':
             print(f"left")
+            imputcode= "00111111"
+            check_zero_one(imputcode)
+
         else if message == 'right':
             print(f"right")
+            imputcode= "01111111"
+            check_zero_one(imputcode)
+
         else if message == 'straight':
             print(f"straight")
+            imputcode= "10111111"
+            check_zero_one(imputcode)
+
         else if message == 'green':
             print(f"green")
+            check_zero_one(message)
         else if message == 'orange':
             print(f"orange")
+            check_zero_one(message)
+
         else if message == 'red':
             print(f"red")
+            check_zero_one(message)
+
 
 
 
