@@ -3,9 +3,12 @@ from PIL import Image
 import io
 import cv2
 import numpy as np
+import time
 
 HOST = '192.168.1.101'  # Address of the server on the local network
 PORT = 9090
+
+foto = 0
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((HOST, PORT))
@@ -26,13 +29,25 @@ try:
     while True:
         image_data = AskImage(client_socket)
         image = Image.open(io.BytesIO(image_data))  # Open the image from the received data
-        image.save("received_image.jpg")  # Save the image as 'received_image.jpg'
-        # image.show()  # Display the image
         
-        newimage = cv2.imread('recieved_image.jpg')
-        cropped_image = newimage[160:200, 0:320]
-        # Convert the image to the HSV color space
-        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        filename = f"received_image_{foto}.jpg"
+        image.save(filename)
+
+        # Increment the variable
+        foto += 1
+        #newimage = cv2.imread('recieved_image.jpg')
+        #cropped_image = newimage[160:200, 0:320]
+        
+        # Define the box for cropping (left, upper, right, lower)
+        crop_box = (0, 160, 320, 200)
+        # Crop the image using the defined box
+        cropped_image = image.crop(crop_box)
+        # Convert the cropped image to a NumPy array
+        cropped_image_np = np.array(cropped_image)
+        # Convert the image from RGB (PIL format) to BGR (OpenCV format)
+        cropped_image_np = cv2.cvtColor(cropped_image_np, cv2.COLOR_RGB2BGR)
+        # Convert the image from BGR to HSV
+        hsv = cv2.cvtColor(cropped_image_np, cv2.COLOR_BGR2HSV)
         #hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
         # Define the lower and upper bounds for the black color in HSV space
@@ -86,7 +101,7 @@ try:
         else:
             print("Go straight")
             client_socket.send("straight".encode('utf-8'))
-
+        time.sleep(1)
 
         # Display the result
         #cv2.imshow('cropped', cropped_image)
