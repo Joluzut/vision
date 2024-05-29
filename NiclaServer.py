@@ -35,8 +35,6 @@ def send_image(communitcation_socket):
     communitcation_socket.send(compressed_img)
     communitcation_socket.send(b'END_OF_IMAGE')
 
-
-
 # Connect to the network
 do_connect()
 
@@ -49,10 +47,16 @@ print(HOST)
 while True:
     communitcation_socket, address = server.accept()
     print(f"Connected to {address}")
-    message = communitcation_socket.recv(1024).decode('utf-8')  # 1024 is the buffer size
-    print(f"Message from client: {message}")
-    if message == 'image':
-        send_image(communitcation_socket)
+    while True:
+        message = communitcation_socket.recv(1024).decode('utf-8')  # 1024 is the buffer size
+        print(f"Message from client: {message}")
+        if message == 'image':
+            send_image(communitcation_socket)
+            print(f"send image")
+        elif message == 'disconnect':
+            communitcation_socket.close()  # Close the socket when the client sends 'disconnect'
+            break
+
 
 #    else if message == 'links':
 
