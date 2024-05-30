@@ -1,5 +1,7 @@
 import socket
 from PIL import Image
+from linedetection import LineDetection
+from stoplicht import detect_traffic_light
 import io
 import cv2
 import numpy as np
@@ -32,96 +34,16 @@ try:
         
         filename = f"received_image_{foto}.jpg"
         #image.save(filename)
-
-        # Increment the variable
         foto += 1
-        #newimage = cv2.imread('recieved_image.jpg')
-        #cropped_image = newimage[160:200, 0:320]
-        
-        # Define the box for cropping (left, upper, right, lower)
-        crop_box = (0, 160, 320, 200)
-        # Crop the image using the defined box
-        cropped_image = image.crop(crop_box)
-        # Convert the cropped image to a NumPy array
-        cropped_image_np = np.array(cropped_image)
+        # Convert the image to a NumPy array
+        image_np = np.array(image)
         # Convert the image from RGB (PIL format) to BGR (OpenCV format)
-        cropped_image_np = cv2.cvtColor(cropped_image_np, cv2.COLOR_RGB2BGR)
+        image_np = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
         # Convert the image from BGR to HSV
-        hsv = cv2.cvtColor(cropped_image_np, cv2.COLOR_BGR2HSV)
-        #hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-
-        # Define the lower and upper bounds for the black color in HSV space
-        lower_black = np.array([0, 0, 0])
-        upper_black = np.array([190, 255, 80])
-
-        # Threshold the HSV image to get only black colors
-        mask = cv2.inRange(hsv, lower_black, upper_black)
-
-        dilate = cv2.dilate(mask, None, iterations=3)
-        erode = cv2.erode(dilate , None, iterations=2)
-        dilate1 = cv2.dilate(erode, None, iterations=3)
-        erode1 = cv2.erode(dilate1 , None, iterations=2)
-        dilate2 = cv2.dilate(erode1, None, iterations=3)
-        erode2 = cv2.erode(dilate2 , None, iterations=2)
-        #gray = cv2.cvtColor(erode2, cv2.COLOR_BGR2GRAY)
-        #blur = cv2.GaussianBlur(erode2, (5, 5), 0)
-        #edges = cv2.Canny(blur, 50, 150)
-        total = 0
-        sum = 0
-        middle = 0
-        constmiddle = 170
-        offset = 0
-        left = 0
-        right = 0
-        overflow = 0
-        send = 0
-
-        for i in range(0, 320):  
-            for j in range(0, 40):
-                if erode2[j][i] == 255:
-                    if i < 160:
-                        left += 1
-                    else:
-                        right += 1
-                    total += 1
-                    sum += i
-
-        overflow = left - right
-        middle = sum / total
-        offset = middle - constmiddle
-
-        print("totaal: " + str(total))
-        print("rechts: " + str(right))
-        print("links: " + str(left))
-        print("middel: " + str(middle))
-        print("offset: " + str(offset))
-        print("overflow: " + str(overflow))
-        if offset < -14 and overflow > -900 and overflow < -500:
-            print("Turn left 1")
-            send = client_socket.send("left".encode('utf-8'))
-        elif offset > 14 and overflow < 900 and overflow > 500:
-            print("Turn right 1")
-            send = client_socket.send("right".encode('utf-8'))
-        elif overflow < -1300:
-            print("Turn left 2")
-            send = client_socket.send("left".encode('utf-8'))
-        elif overflow > 1300:
-            print("Turn right 2")
-            send = client_socket.send("right".encode('utf-8'))
-        else:
-            print("Go straight")
-            send = client_socket.send("straight".encode('utf-8'))
-        #time.sleep(1)
-        print(str(send))
-        # Display the result
-        #cv2.imshow('cropped', cropped_image)
-        #cv2.imshow('og', image)
-        #cv2.imshow('erode2', erode)
-        #cv2.imshow('dilate2', dilate)
-        #cv2.imshow('mask', mask)
-        #cv2.imshow('edges', edges)
-        #cv2.waitKey(0)
-        #cv2.destroyAllWindows()
+        hsv = cv2.cvtColor(image_np, cv2.COLOR_BGR2HSV)
+       
+        detect_traffic_light(hsv, client_socket)
+        LineDetection(hsv, client_socket)
 except Exception as e:
     print(f"An error occurred: {e}")
     client_socket.send("disconnect".encode('utf-8'))
