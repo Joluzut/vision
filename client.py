@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import time
 
-HOST = '192.168.1.101'  # Address of the server on the local network
+HOST = '192.168.1.103'  # Address of the server on the local network
 PORT = 9090
 
 foto = 0
@@ -31,7 +31,7 @@ try:
         image = Image.open(io.BytesIO(image_data))  # Open the image from the received data
         
         filename = f"received_image_{foto}.jpg"
-        #image.save(filename)
+        image.save(filename)
 
         # Increment the variable
         foto += 1
@@ -69,12 +69,10 @@ try:
         total = 0
         sum = 0
         middle = 0
-        constmiddle = 170
+        constmiddle = 185
         offset = 0
         left = 0
-        right = 0
-        overflow = 0
-        send = 0
+        right = 0 
 
         for i in range(0, 320):  
             for j in range(0, 40):
@@ -85,34 +83,26 @@ try:
                         right += 1
                     total += 1
                     sum += i
+                
 
-        overflow = left - right
         middle = sum / total
         offset = middle - constmiddle
-
         print("totaal: " + str(total))
         print("rechts: " + str(right))
         print("links: " + str(left))
         print("middel: " + str(middle))
         print("offset: " + str(offset))
-        print("overflow: " + str(overflow))
-        if offset < -14 and overflow > -900 and overflow < -500:
-            print("Turn left 1")
-            send = client_socket.send("left".encode('utf-8'))
-        elif offset > 14 and overflow < 900 and overflow > 500:
-            print("Turn right 1")
-            send = client_socket.send("right".encode('utf-8'))
-        elif overflow < -1300:
-            print("Turn left 2")
-            send = client_socket.send("left".encode('utf-8'))
-        elif overflow > 1300:
-            print("Turn right 2")
-            send = client_socket.send("right".encode('utf-8'))
+        if offset < -14:
+            print("Turn left")
+            client_socket.send("left".encode('utf-8'))
+        elif offset > 14:
+            print("Turn right")
+            client_socket.send("right".encode('utf-8'))
         else:
             print("Go straight")
-            send = client_socket.send("straight".encode('utf-8'))
-        #time.sleep(1)
-        print(str(send))
+            client_socket.send("straight".encode('utf-8'))
+        time.sleep(1)
+
         # Display the result
         #cv2.imshow('cropped', cropped_image)
         #cv2.imshow('og', image)

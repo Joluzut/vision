@@ -82,12 +82,12 @@ while True:
 
             elif message == 'right':
                 print(f"right")
-                imputcode= "01010000"
+                imputcode= "01001100"
                 check_zero_one(imputcode)
 
             elif message == 'straight':
                 print(f"straight")
-                imputcode= "10010000"
+                imputcode= "10001100"
                 check_zero_one(imputcode)
 
             elif message == 'green':
