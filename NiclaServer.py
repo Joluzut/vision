@@ -7,7 +7,7 @@ from machine import Pin
 toZumo = Pin("PA9", Pin.OUT_PP)
 
 # Configuration
-HOST = '192.168.1.100'  # This should be the private IP address of the Nicla
+HOST = '192.168.1.103'  # This should be the private IP address of the Nicla
 PORT = 9090  # or another port
 SSID = "ICIDU"
 KEY = "ICIDUAVANS"
@@ -52,6 +52,7 @@ do_connect()
 
 # Create and bind the server socket
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server.bind((HOST, PORT))
 server.listen(5)  # Number of connections can be set here
 print(HOST)
