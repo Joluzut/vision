@@ -53,10 +53,11 @@ do_connect()
 # Create and bind the server socket
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((HOST, PORT))
-server.listen(1)  # Number of connections can be set here
+server.listen(5)  # Number of connections can be set here
 print(HOST)
 
 while True:
+    print(f"waiting for socket")
     communication_socket, address = server.accept()
     print(f"Connected to {address}")
     try:
@@ -66,7 +67,7 @@ while True:
         if message == 'image':
             send_image(communication_socket)
             print("Sent image")
-            inputcode = "10"
+            inputcode = "10010000"
             check_zero_one(inputcode)
 
         elif message == 'left':
@@ -76,12 +77,12 @@ while True:
 
         elif message == 'right':
             print("right")
-            inputcode = "01001100"
+            inputcode = "01001000"
             check_zero_one(inputcode)
 
         elif message == 'straight':
             print("straight")
-            inputcode = "10001100"
+            inputcode = "10001000"
             check_zero_one(inputcode)
 
         elif message == 'green':
@@ -99,7 +100,11 @@ while True:
         elif message == 'disconnect':
             print("Disconnecting")
 
+        else:
+            print(f"Unknown message: {message}")
+
     except Exception as e:
         print(f"Exception: {e}")
     finally:
+#        print(f"communication_socket closed")
         communication_socket.close()
