@@ -7,7 +7,7 @@ from machine import Pin
 toZumo = Pin("PA9", Pin.OUT_PP)
 
 # Configuration
-HOST = '192.168.1.103'  # This should be the private IP address of the Nicla
+HOST = '192.168.1.100'  # This should be the private IP address of the Nicla
 PORT = 9090  # or another port
 SSID = "ICIDU"
 KEY = "ICIDUAVANS"
@@ -46,6 +46,8 @@ def send_image(communication_socket):
     compressed_img = img.compress(quality=15)  # Compress the image
     communication_socket.send(compressed_img)
     communication_socket.send(b'END_OF_IMAGE')
+    print("Sent image")
+
 
 # Connect to the network
 do_connect()
@@ -67,9 +69,8 @@ while True:
 
         if message == 'image':
             send_image(communication_socket)
-            print("Sent image")
-            inputcode = "10010000"
-            check_zero_one(inputcode)
+#            inputcode = "10010000"
+#            check_zero_one(inputcode)
 
         elif message == 'left':
             print("left")
