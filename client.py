@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 import time
 
-HOST = '192.168.1.101'  # Address of the server on the local network
+HOST = '192.168.1.103'  # Address of the server on the local network
 PORT = 9090
 
 foto = 0
@@ -33,6 +33,9 @@ try:
         image = Image.open(io.BytesIO(image_data))  # Open the image from the received data
         
         filename = f"received_image_{foto}.jpg"
+        image.save(filename)
+
+        # Increment the variable
         #image.save(filename)
         foto += 1
         # Convert the image to a NumPy array
@@ -44,6 +47,7 @@ try:
        
         detect_traffic_light(hsv, client_socket)
         LineDetection(hsv, client_socket)
+
 except Exception as e:
     print(f"An error occurred: {e}")
     client_socket.send("disconnect".encode('utf-8'))
