@@ -2,8 +2,7 @@ import numpy as np
 import cv2
 from PIL import Image
 
-
-def LineDetection(image, client_socket):
+def LineDetection(image):
     # Define the box for cropping (left, upper, right, lower)
     crop_box = (0, 160, 320, 200)
     # Crop the image using the defined box
@@ -50,23 +49,21 @@ def LineDetection(image, client_socket):
     offset = middle - constmiddle
     overflow = left - right
 
-    print("totaal: " + str(total))
-    print("rechts: " + str(right))
-    print("links: " + str(left))
-    print("middel: " + str(middle))
-    print("offset: " + str(offset))
-    print("overflow: " + str(overflow))
+    #print("totaal: " + str(total))
+    #print("rechts: " + str(right))
+    #print("links: " + str(left))
+    #print("middel: " + str(middle))
+    #print("offset: " + str(offset))
+    #print("overflow: " + str(overflow))
 
     if offset < -14 and -900 < overflow < -500:
-        send = client_socket.send("left".encode('utf-8'))
+        return "left"
     elif offset > 14 and 500 < overflow < 900:
-        send = client_socket.send("right".encode('utf-8'))
+        return "right"
     elif overflow < -1300:
-        send = client_socket.send("left".encode('utf-8'))
+        return "left"
     elif overflow > 1300:
-        send = client_socket.send("right".encode('utf-8'))
+        return "right"
     else:
-        send = client_socket.send("straight".encode('utf-8'))
+        return "straight"
 
-    
-    print(str(send))

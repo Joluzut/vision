@@ -1,5 +1,6 @@
 import socket
 from PIL import Image
+from linedetection import LineDetection
 import io
 import cv2
 import numpy as np
@@ -18,6 +19,7 @@ def make_socket():
 def ask_image():
     client_socket = make_socket()
     client_socket.send("image".encode('utf-8'))
+    print("asked image")
 
     image_data = b""
     while True:
@@ -27,15 +29,35 @@ def ask_image():
             break
         image_data += packet
     client_socket.close()
+    print("recieved image")
     return image_data
 
+def senCommand(myCommand):
+    try:
+        command = myCommand
+        client_socket = make_socket()
+        
+        if client_socket is None:
+            print("Failed to create or connect the socket.")
+            return
+        
+        # Send the command
+        client_socket.send(command.encode('utf-8'))
+        
+        # Close the socket
+        client_socket.close()
+        
+        print("Command sent successfully.")
+    except Exception as e:
+        print(f"Error sending command: {e}")
+     
 try: 
     while True:
         image_data = ask_image()
         image = Image.open(io.BytesIO(image_data))  # Open the image from the received data
         
         filename = f"received_image_{foto}.jpg"
-        image.save(filename)
+        #image.save(filename)
 
         # Increment the variable
         foto += 1
@@ -48,9 +70,11 @@ try:
         
         # Convert the image from BGR to HSV
         hsv = cv2.cvtColor(image_np, cv2.COLOR_BGR2HSV)
-       
+        
         # detect_traffic_light(hsv)
-        # LineDetection(hsv)
+        antwoord = LineDetection(hsv)
+        print(antwoord)
+        senCommand(antwoord)
         
 except Exception as e:
     print(f"An error occurred: {e}")
