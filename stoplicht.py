@@ -35,27 +35,30 @@ def detect_traffic_light(image, client_socket):
     mask_red = cv2.bitwise_or(mask_red1, mask_red2)
     mask_yellow = cv2.inRange(hsv, yellow_lower, yellow_upper)
     mask_green = cv2.inRange(hsv, green_lower, green_upper)
-    cv2.imshow('green', mask_green)
-    cv2.imshow('yellow', mask_yellow)
-    cv2.imshow('red', mask_red)
+
     contours_red, _ = cv2.findContours(mask_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     contours_yellow, _ = cv2.findContours(mask_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     contours_green, _ = cv2.findContours(mask_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    red = 0
+    green = 0
+    orange = 0
     for cnt in contours_red:
         if cv2.contourArea(cnt) > 500:
             x, y, w, h = cv2.boundingRect(cnt)
             aspect_ratio = float(w) / h
             if 0.8 <= aspect_ratio <= 1.2 and is_surrounded_by_black(image, x, y, w, h):
                 #cv2.rectangle(image, (x, y), (x+w, y+h), (0, 0, 255), 2)  # Red
-                send = client_socket.send("red".encode('utf-8'))
+                red = red + 1
+                
 
     for cnt in contours_yellow:
         if cv2.contourArea(cnt) > 500:
             x, y, w, h = cv2.boundingRect(cnt)
             aspect_ratio = float(w) / h
             if 0.8 <= aspect_ratio <= 1.2 and is_surrounded_by_black(image, x, y, w, h):
-                #cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 255), 2)  # 
-                send = client_socket.send("orange".encode('utf-8'))
+                #cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 255), 2)  #Orange
+                orange = orange + 1
+                
 
     for cnt in contours_green:
         if cv2.contourArea(cnt) > 500:
@@ -63,6 +66,13 @@ def detect_traffic_light(image, client_socket):
             aspect_ratio = float(w) / h
             if 0.8 <= aspect_ratio <= 1.2 and is_surrounded_by_black(image, x, y, w, h):
                 #cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)  # Green
-                send = client_socket.send("green".encode('utf-8'))
-    print(str(send))
+                green = green + 1
+                
+
+    if green > orange and green > red:
+        client_socket.send("green".encode('utf-8'))
+    elif orange > green and orange > red:
+        client_socket.send("orange".encode('utf-8'))
+    else: 
+        client_socket.send("red".encode('utf-8'))
     

@@ -47,11 +47,8 @@ def LineDetection(image, client_socket):
 
     if total > 0:
         middle = sum / total
-        offset = middle - constmiddle
-        overflow = left - right
-    else:
-        print("No black line detected.")
-        return "No black line detected."
+    offset = middle - constmiddle
+    overflow = left - right
 
     print("totaal: " + str(total))
     print("rechts: " + str(right))
@@ -61,17 +58,15 @@ def LineDetection(image, client_socket):
     print("overflow: " + str(overflow))
 
     if offset < -14 and -900 < overflow < -500:
-        direction = "left"
+        send = client_socket.send("left".encode('utf-8'))
     elif offset > 14 and 500 < overflow < 900:
-        direction = "right"
+        send = client_socket.send("right".encode('utf-8'))
     elif overflow < -1300:
-        direction = "left"
+        send = client_socket.send("left".encode('utf-8'))
     elif overflow > 1300:
-        direction = "right"
+        send = client_socket.send("right".encode('utf-8'))
     else:
-        direction = "straight"
+        send = client_socket.send("straight".encode('utf-8'))
 
-    print(f"Turn {direction}")
-    send = client_socket.send(direction.encode('utf-8'))
+    
     print(str(send))
-    return direction

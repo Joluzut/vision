@@ -8,7 +8,7 @@ toZumo = Pin("PA9", Pin.OUT_PP)
 
 
 # Configuration
-HOST = '192.168.1.101'  # This should be the private IP address of the Nicla
+HOST = '192.168.1.100'  # This should be the private IP address of the Nicla
 PORT = 9090  # or another port
 SSID = "ICIDU"
 KEY = "ICIDUAVANS"
