@@ -7,7 +7,7 @@ import numpy as np
 from io import BytesIO
 import time
 
-HOST = '192.168.1.100'  # Address of the server on the local network
+HOST = '192.168.1.103'  # Address of the server on the local network
 PORT = 9090
 
 foto = 0
@@ -17,19 +17,19 @@ def make_socket():
     client_socket.connect((HOST, PORT))
     return client_socket
 
-
-def ask_image():
-    def receive_image(client_socket):
+def receive_image(client_socket):
         image_data = b""
         start_time = time.time()  # Record the start time
 
         while True:
             try:
                 packet = client_socket.recv(1024)  # Receive 1024 bytes from the socket
+                print(f"packet: {packet.__sizeof__()}")
                 if b'END_OF_IMAGE' in packet:  # Check if the end of image sequence is in the received packet
                     image_data += packet[:-len(b'END_OF_IMAGE')]  # Remove the end of image sequence from the image data
                     break
                 image_data += packet
+                print(f"image data: {image_data.__sizeof__()}")
             except socket.timeout:
                 elapsed_time = time.time() - start_time  # Calculate elapsed time
                 if elapsed_time > 0.5:  # If more than 500ms has passed
@@ -39,6 +39,8 @@ def ask_image():
 
         return image_data
 
+def ask_image():
+    
     while True:
         client_socket = make_socket()
         client_socket.settimeout(0.5)  # Set timeout to 500ms
@@ -69,7 +71,7 @@ def ask_image():
             client_socket.close()
         print("received image")
 
-    return image_data
+
 
 
 def senCommand(myCommand):
