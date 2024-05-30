@@ -6,7 +6,6 @@ from machine import Pin
 
 toZumo = Pin("PA9", Pin.OUT_PP)
 
-
 # Configuration
 HOST = '192.168.1.100'  # This should be the private IP address of the Nicla
 PORT = 9090  # or another port
@@ -29,7 +28,6 @@ def check_zero_one(input_string):
         else:
             toZumo.low()
 
-
 def do_connect():
     sta_if = network.WLAN(network.STA_IF)
     if not sta_if.isconnected():
@@ -42,64 +40,66 @@ def do_connect():
             pass
     print('Network config:', sta_if.ifconfig())
 
-def send_image(communitcation_socket):
+def send_image(communication_socket):
     img = sensor.snapshot()
     img.rotation_corr(z_rotation=180)  # Rotate the image 180 degrees
-    compressed_img = img.compress(quality = 15)  # Compress the image
-    communitcation_socket.send(compressed_img)
-    communitcation_socket.send(b'END_OF_IMAGE')
+    compressed_img = img.compress(quality=15)  # Compress the image
+    communication_socket.send(compressed_img)
+    communication_socket.send(b'END_OF_IMAGE')
 
 # Connect to the network
 do_connect()
 
 # Create and bind the server socket
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server.bind((HOST, PORT))
 server.listen(1)  # Number of connections can be set here
 print(HOST)
 
 while True:
-    communitcation_socket, address = server.accept()
+    communication_socket, address = server.accept()
     print(f"Connected to {address}")
     try:
-        while True:
-            message = communitcation_socket.recv(1024).decode('utf-8')  # 1024 is the buffer size
-            print(f"Message from client: {message}")
-            if message == 'image':
-                send_image(communitcation_socket)
-                print(f"send image")
-                imputcode= "10"
-                check_zero_one(imputcode)
+        message = communication_socket.recv(1024).decode('utf-8')  # 1024 is the buffer size
+        print(f"Message from client: {message}")
 
-            elif message == 'disconnect':
-                communitcation_socket.close()  # Close the socket when the client sends 'disconnect'
-                break
-            elif message == 'left':
-                print(f"left")
-                imputcode= "00010000"
-                check_zero_one(imputcode)
+        if message == 'image':
+            send_image(communication_socket)
+            print("Sent image")
+            inputcode = "10"
+            check_zero_one(inputcode)
 
-            elif message == 'right':
-                print(f"right")
-                imputcode= "01001100"
-                check_zero_one(imputcode)
+        elif message == 'left':
+            print("left")
+            inputcode = "00010000"
+            check_zero_one(inputcode)
 
-            elif message == 'straight':
-                print(f"straight")
-                imputcode= "10001100"
-                check_zero_one(imputcode)
+        elif message == 'right':
+            print("right")
+            inputcode = "01001100"
+            check_zero_one(inputcode)
 
-            elif message == 'green':
-                print(f"green")
-                check_zero_one(message)
-            elif message == 'orange':
-                print(f"orange")
-                check_zero_one(message)
+        elif message == 'straight':
+            print("straight")
+            inputcode = "10001100"
+            check_zero_one(inputcode)
 
-            elif message == 'red':
-                print(f"red")
-                check_zero_one(message)
+        elif message == 'green':
+            print("green")
+            check_zero_one(message)
+
+        elif message == 'orange':
+            print("orange")
+            check_zero_one(message)
+
+        elif message == 'red':
+            print("red")
+            check_zero_one(message)
+
+        elif message == 'disconnect':
+            print("Disconnecting")
+
     except Exception as e:
-        do_connect()
-#    communitcation_socket.close()  # Ensure the socket is closed after the interaction
+        print(f"Exception: {e}")
+    finally:
+        communication_socket.close()
