@@ -7,7 +7,7 @@ from machine import Pin
 toZumo = Pin("PA9", Pin.OUT_PP)
 
 # Configuration
-HOST = '192.168.1.103'  # This should be the private IP address of the Nicla
+HOST = '192.168.1.102'  # This should be the private IP address of the Nicla
 PORT = 9090  # or another port
 SSID = "ICIDU"
 KEY = "ICIDUAVANS"

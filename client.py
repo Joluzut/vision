@@ -7,7 +7,7 @@ import numpy as np
 from io import BytesIO
 import time
 
-HOST = '192.168.1.103'  # Address of the server on the local network
+HOST = '192.168.1.102'  # Address of the server on the local network
 PORT = 9090
 
 foto = 0
@@ -17,6 +17,9 @@ def make_socket():
     client_socket.connect((HOST, PORT))
     return client_socket
 
+import socket
+import time
+
 def receive_image(client_socket):
         image_data = b""
         start_time = time.time()  # Record the start time
@@ -24,12 +27,10 @@ def receive_image(client_socket):
         while True:
             try:
                 packet = client_socket.recv(1024)  # Receive 1024 bytes from the socket
-                print(f"packet: {packet.__sizeof__()}")
                 if b'END_OF_IMAGE' in packet:  # Check if the end of image sequence is in the received packet
                     image_data += packet[:-len(b'END_OF_IMAGE')]  # Remove the end of image sequence from the image data
                     break
                 image_data += packet
-                print(f"image data: {image_data.__sizeof__()}")
             except socket.timeout:
                 elapsed_time = time.time() - start_time  # Calculate elapsed time
                 if elapsed_time > 0.5:  # If more than 500ms has passed
@@ -47,10 +48,10 @@ def ask_image():
 
         try:
             client_socket.send("image".encode('utf-8'))
-            print("asked image")
+            # print("asked image")
 
             image_data = receive_image(client_socket)
-            print("received image")
+            # print("received image")
 
             # Validate the received image data
             image = Image.open(BytesIO(image_data))
@@ -58,18 +59,18 @@ def ask_image():
             return image_data  # Return the valid image data
 
         except (socket.error, socket.timeout) as e:
-            print(f"Connection error occurred: {e}")
+            # print("Connection error occurred: {e}")
             client_socket.close()
             time.sleep(1)  # Wait before retrying
 
         except (IOError, SyntaxError) as e:
-            print(f"Image validation error: {e}")
+            # print(f"Image validation error: {e}")
             client_socket.close()
             time.sleep(1)  # Wait before retrying
 
         finally:
             client_socket.close()
-        print("received image")
+        # print("received image")
 
 
 
@@ -89,9 +90,10 @@ def senCommand(myCommand):
         # Close the socket
         client_socket.close()
         
-        print("Command sent successfully.")
+        # print("Command sent successfully.")
     except Exception as e:
-        print(f"Error sending command: {e}")
+        a = 1+ 1
+        # print(f"Error sending command: {e}")
      
 try: 
     while True:
