@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 from PIL import Image
 
-def LineDetection(image):
+def LineDetection(image, prev):
     # Define the box for cropping (left, upper, right, lower)
     crop_box = (0, 160, 320, 200)
     # Crop the image using the defined box
@@ -26,6 +26,7 @@ def LineDetection(image):
     erode2 = cv2.erode(dilate2, None, iterations=2)
 
     total = 0
+    total2 = 0
     sum = 0
     middle = 0
     constmiddle = 170
@@ -43,6 +44,12 @@ def LineDetection(image):
                     right += 1
                 total += 1
                 sum += i
+        if erode2[19][i] == 255:
+            total2 += 1
+        if erode2[20][i] == 255:
+            total2 += 1
+        if erode2[21][i] == 255:
+            total2 += 1
 
     if total > 0:
         middle = sum / total
@@ -55,6 +62,14 @@ def LineDetection(image):
     #print("middel: " + str(middle))
     #print("offset: " + str(offset))
     #print("overflow: " + str(overflow))
+
+    if prev == "straight" and overflow > 1700:
+        return "tright"
+    elif prev == "straight" and overflow < -1700:
+        return "tleft"
+    
+    if prev == "straight" and total2 < 5:
+        return "cross"
 
     if offset < -14 and -900 < overflow < -500:
         return "left"

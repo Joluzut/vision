@@ -86,7 +86,12 @@ while True:
             print("straight")
             inputcode = "10001000"
             check_zero_one(inputcode)
-
+        elif message == 'tleft':
+            print("tleft")
+            inputcode = "00000000"
+        elif message == 'tright' or message == 'cross':
+            print("tright")
+            inputcode = "01000000"
         elif message == 'green':
             print("green")
             check_zero_one(message)

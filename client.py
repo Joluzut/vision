@@ -11,6 +11,10 @@ HOST = '192.168.1.102'  # Address of the server on the local network
 PORT = 9090
 
 foto = 0
+prev = ""
+tick = 0
+temp = ""
+flag = 0
 
 def make_socket():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -101,7 +105,7 @@ try:
         image = Image.open(io.BytesIO(image_data))  # Open the image from the received data
         
         filename = f"received_image_{foto}.jpg"
-        #image.save(filename)
+        image.save(filename)
 
         # Increment the variable
         foto += 1
@@ -116,11 +120,23 @@ try:
         hsv = cv2.cvtColor(image_np, cv2.COLOR_BGR2HSV)
         
         # detect_traffic_light(hsv)
-        antwoord = LineDetection(hsv)
+        antwoord = LineDetection(hsv, prev)
+        if antwoord == "tright" or antwoord == "tleft" or antwoord == "cross":
+            temp = antwoord
+            antwoord = prev
+            flag = 1 
+
+        prev = antwoord
+
+        if flag == 1:
+            tick += 1
+            if tick == 30:
+                antwoord = temp
+        
         print(antwoord)
         senCommand(antwoord)
-        time.sleep(0.20)
-        
+        time.sleep(0.15)
+           
 except Exception as e:
     print(f"An error occurred: {e}")
     client_socket = make_socket()
