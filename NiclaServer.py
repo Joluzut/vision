@@ -77,37 +77,6 @@ while True:
 #            inputcode = "10010000"
 #            check_zero_one(inputcode)
 
-        elif message == 'left':
-            print("left")
-            inputcode = "00010000"
-            #check_zero_one(inputcode)
-
-        elif message == 'right':
-            print("right")
-            inputcode = "01010000"
-            #check_zero_one(inputcode)
-
-        elif message == 'straight':
-            print("straight")
-            inputcode = "10001000"
-            #check_zero_one(inputcode)
-        elif message == 'tleft':
-            print("tleft")
-            #inputcode = "00000000"
-        elif message == 'tright' or message == 'cross':
-            print("tright")
-            #inputcode = "01000000"
-        elif message == 'green':
-            print("green")
-            check_zero_one(message)
-
-        elif message == 'orange':
-            print("orange")
-            check_zero_one(message)
-
-        elif message == 'red':
-            print("red")
-            check_zero_one(message)
         elif message == 'disconnect':
             print("Disconnecting")
 
