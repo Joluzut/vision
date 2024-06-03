@@ -28,6 +28,10 @@ def check_zero_one(input_string):
         else:
             toZumo.low()
 
+    time.sleep_us(500)
+    toZumo.high()
+
+
 def do_connect():
     sta_if = network.WLAN(network.STA_IF)
     if not sta_if.isconnected():
@@ -66,6 +70,7 @@ while True:
     try:
         message = communication_socket.recv(1024).decode('utf-8')  # 1024 is the buffer size
         print(f"Message from client: {message}")
+        message = str(message)
 
         if message == 'image':
             send_image(communication_socket)
