@@ -7,7 +7,7 @@ from machine import Pin
 toZumo = Pin("PA9", Pin.OUT_PP)
 
 # Configuration
-HOST = '192.168.1.102'  # This should be the private IP address of the Nicla
+HOST = '192.168.1.100'  # This should be the private IP address of the Nicla
 PORT = 9090  # or another port
 SSID = "ICIDU"
 KEY = "ICIDUAVANS"
@@ -75,23 +75,23 @@ while True:
         elif message == 'left':
             print("left")
             inputcode = "00010000"
-            check_zero_one(inputcode)
+            #check_zero_one(inputcode)
 
         elif message == 'right':
             print("right")
-            inputcode = "01001000"
-            check_zero_one(inputcode)
+            inputcode = "01010000"
+            #check_zero_one(inputcode)
 
         elif message == 'straight':
             print("straight")
             inputcode = "10001000"
-            check_zero_one(inputcode)
+            #check_zero_one(inputcode)
         elif message == 'tleft':
             print("tleft")
-            inputcode = "00000000"
+            #inputcode = "00000000"
         elif message == 'tright' or message == 'cross':
             print("tright")
-            inputcode = "01000000"
+            #inputcode = "01000000"
         elif message == 'green':
             print("green")
             check_zero_one(message)

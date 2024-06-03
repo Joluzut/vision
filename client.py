@@ -7,11 +7,11 @@ import numpy as np
 from io import BytesIO
 import time
 
-HOST = '192.168.1.102'  # Address of the server on the local network
+HOST = '192.168.1.101'  # Address of the server on the local network
 PORT = 9090
 
 foto = 0
-prev = ""
+prev = "" 
 tick = 0
 temp = ""
 flag = 0
@@ -93,7 +93,7 @@ def senCommand(myCommand):
         
         # Close the socket
         client_socket.close()
-        
+           
         # print("Command sent successfully.")
     except Exception as e:
         a = 1+ 1
@@ -105,8 +105,8 @@ try:
         image = Image.open(io.BytesIO(image_data))  # Open the image from the received data
         
         filename = f"received_image_{foto}.jpg"
-        image.save(filename)
-
+        
+        #senCommand("stop")
         # Increment the variable
         foto += 1
         
@@ -133,8 +133,13 @@ try:
             if tick == 30:
                 antwoord = temp
         
-        print(antwoord)
+        #print(antwoord)
         senCommand(antwoord)
+        first_two_bits = antwoord[:2]
+        if first_two_bits == '00':
+            print("First two bits are 00")
+            image.save(filename)
+        
         time.sleep(0.15)
            
 except Exception as e:
