@@ -7,7 +7,7 @@ from machine import Pin
 toZumo = Pin("PA9", Pin.OUT_PP)
 
 # Configuration
-HOST = '192.168.1.102'  # This should be the private IP address of the Nicla
+HOST = '192.168.1.101'  # This should be the private IP address of the Nicla
 PORT = 9090  # or another port
 SSID = "ICIDU"
 KEY = "ICIDUAVANS"
@@ -72,43 +72,14 @@ while True:
 #            inputcode = "10010000"
 #            check_zero_one(inputcode)
 
-        elif message == 'left':
-            print("left")
-            inputcode = "00010000"
-            check_zero_one(inputcode)
-
-        elif message == 'right':
-            print("right")
-            inputcode = "01001000"
-            check_zero_one(inputcode)
-
-        elif message == 'straight':
-            print("straight")
-            inputcode = "10001000"
-            check_zero_one(inputcode)
-        elif message == 'tleft':
-            print("tleft")
-            inputcode = "00000000"
-        elif message == 'tright' or message == 'cross':
-            print("tright")
-            inputcode = "01000000"
-        elif message == 'green':
-            print("green")
-            check_zero_one(message)
-
-        elif message == 'orange':
-            print("orange")
-            check_zero_one(message)
-
-        elif message == 'red':
-            print("red")
-            check_zero_one(message)
-
         elif message == 'disconnect':
             print("Disconnecting")
 
+        elif message == 'stop':
+            print("stop")
+
         else:
-            print(f"Unknown message: {message}")
+            check_zero_one(message)
 
     except Exception as e:
         print(f"Exception: {e}")
