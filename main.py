@@ -25,7 +25,7 @@ lower_black = np.array([0, 0, 0])
 upper_black = np.array([190, 255, 80])
 
 # Threshold the HSV image to get only black colors
-mask = cv2.inRange(hsv, lower_black, upper_black)
+mask = cv2.inRange(cropped_image, lower_black, upper_black)
 
 dilate = cv2.dilate(mask, None, iterations=3)
 erode = cv2.erode(dilate, None, iterations=2)
@@ -49,10 +49,10 @@ flag = 0
 flag1 = 0
 change2 = 0
 
-for i in range(0, 310):
+for i in range(0, 300):
     for j in range(0, 40):
         if erode2[j][i] == 255:
-            if i < 160:
+            if i < 145:
                 left += 1
             else:
                 right += 1
@@ -65,14 +65,11 @@ for i in range(0, 310):
     if erode2[21][i] == 255:
         total2 += 1
     if erode2[0][i] == 255 and flag == 0:
-        print(i)
         change = i
         flag = 1
-    if erode2[20][309-i] == 255 and flag1 == 0:
-        print(i)
-        change1 = 309-i
+    if erode2[20][299-i] == 255 and flag1 == 0:
+        change1 = 299-i
         flag1 = 1
-
 
 if total > 0:
     middle = sum / total
@@ -85,36 +82,35 @@ if change2 > 165:
 
 if change2 < 165:
     change2 = 165 - change2
-change2 = change2/1.5
+
+change2 = change2 / 7
 change2 = math.floor(change2)
-print("totaal: " + str(total))
-print("rechts: " + str(right))
-print("links: " + str(left))
-print("middel: " + str(middle))
-print("offset: " + str(offset))
-print("overflow: " + str(overflow))
-print("change: " + str(change))
-print("change1: " + str(change1))
-print("change2: " + str(change2))
+if change2 >= 64:
+    change2 = 63
+if change2 <= 0:
+    change2 = 1
+print("change2 " + str(change2))
+print("overflow " + str(overflow))
+print("offset" + str(offset))
+fixed_binary = bin(change2)[2:].zfill(6)  # Ensure the binary string is zero-padded to 6 bits
 
-if overflow > 1700:
-    print("tright")
-elif overflow < -1700:
-    print("tleft")
     
-if total2 < 5:
-    print("cross")
-
-if offset < -14 and -900 < overflow < 900:
-    print("left1")
-elif offset > 14 and -900 < overflow < 900:
-    print("right1")
+if offset > 15 and -900 < overflow < 900 and offset < 100:
+    print("rechts 1")
+    binary = '01' + fixed_binary
+elif offset < -15 and -900 < overflow < 900 and offset > -100:
+    print("links 1")
+    binary = '00' + fixed_binary
 elif overflow < -1600:
-    print("left2")
+    print("links 2")
+    binary = '00' + fixed_binary
 elif overflow > 1600:
-    print("right2")
+    print("rechts 2")
+    binary = '01' + fixed_binary
 else:
-    print("straight")
+    print("rechtdoor")
+    binary = '10' + fixed_binary
+print(binary)
 
 # Display the result
 cv2.imshow('cropped', cropped_image)
