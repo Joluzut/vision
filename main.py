@@ -3,7 +3,7 @@ import numpy as np
 import math
 
 # Read the image
-image = cv2.imread('received_image_152.jpg')
+image = cv2.imread('C:/school/visiongithub/received_image_72.jpg')
 # Convert the image to a NumPy array
 image_np = np.array(image)
       
@@ -48,16 +48,22 @@ change1 = 0
 flag = 0
 flag1 = 0
 change2 = 0
-
-for i in range(0, 300):
-    for j in range(0, 40):
+change3 = 0
+white_pixel_counts = []
+biggestline = 0
+for j in range(0, 40):
+    white_pixels_in_line = 0  # Count white pixels in the current horizontal line
+    for i in range(0, 310):
         if erode2[j][i] == 255:
-            if i < 145:
+            white_pixels_in_line += 1
+            if i < 160:
                 left += 1
             else:
                 right += 1
             total += 1
             sum += i
+    if biggestline < white_pixels_in_line:
+        biggestline = white_pixels_in_line
     if erode2[19][i] == 255:
         total2 += 1
     if erode2[20][i] == 255:
@@ -70,7 +76,8 @@ for i in range(0, 300):
     if erode2[20][299-i] == 255 and flag1 == 0:
         change1 = 299-i
         flag1 = 1
-
+    if erode2[40][i] == 255 and flag == 0:
+        change3 = i
 if total > 0:
     middle = sum / total
 offset = middle - constmiddle
@@ -89,13 +96,21 @@ if change2 >= 64:
     change2 = 63
 if change2 <= 0:
     change2 = 1
+print("change1 " + str(change1))
 print("change2 " + str(change2))
 print("overflow " + str(overflow))
 print("offset" + str(offset))
+print("biggest line:"+ str(biggestline))
 fixed_binary = bin(change2)[2:].zfill(6)  # Ensure the binary string is zero-padded to 6 bits
-
-    
-if offset > 15 and -900 < overflow < 900 and offset < 100:
+if biggestline > 150:
+    print("90")
+    if change3 > 150:
+        print("left")
+        binary = '00000000'
+    else:
+        print("right")
+        binary = '01000000'
+elif offset > 15 and -900 < overflow < 900 and offset < 100:
     print("rechts 1")
     binary = '01' + fixed_binary
 elif offset < -15 and -900 < overflow < 900 and offset > -100:
