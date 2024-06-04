@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 from io import BytesIO
 import time
+from bordenherkenningtop import show
 
 HOST = '192.168.1.101'  # Address of the server on the local network
 PORT = 9090
@@ -131,6 +132,11 @@ try:
         senCommand(licht)
 
         antwoord = LineDetection(hsv, prev)
+
+                
+        bord = show(image_np)
+        senCommand(bord)
+        print("bord:",bord)
 
         if antwoord == '00000000' or antwoord == '01000000':
             print("bocht")
