@@ -62,7 +62,7 @@ def LineDetection(image, prev):
                 if erode2[40][259-i] == 255 or flag1 == 1:
                     change1 = 259 - i
                     flag1 = 1
-        if biggestline < white_pixels_in_line:
+        if biggestline < white_pixels_in_line and j > 30:
             temp = j
             biggestline = white_pixels_in_line
     for k in range(0, 260):
@@ -106,19 +106,19 @@ def LineDetection(image, prev):
             binary = '00000000'
         else:
             print("right")
-            binary = '01000000'    
+            binary = '01000000'  
+    elif overflow < -600:
+        print("links 2")
+        binary = '00' + fixed_binary
+    elif overflow > 600:
+        print("rechts 2")
+        binary = '01' + fixed_binary  
     elif offset > 25:
         print("rechts 1")
         binary = '01' + fixed_binary
     elif offset < -25:
         print("links 1")
         binary = '00' + fixed_binary
-    elif overflow < -600:
-        print("links 2")
-        binary = '00' + fixed_binary
-    elif overflow > 600:
-        print("rechts 2")
-        binary = '01' + fixed_binary
     else:
         print("rechtdoor")
         binary = '10' + fixed_binary

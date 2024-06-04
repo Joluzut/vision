@@ -111,7 +111,7 @@ try:
         image_data = ask_image()
         image = Image.open(io.BytesIO(image_data))  # Open the image from the received data
         
-        filename = f"14received_image_{foto}.jpg"
+        filename = f"17received_image_{foto}.jpg"
         print("image: "+ str(foto))
         image.save(filename)
         image.save('afbeelding.jpg')
@@ -129,15 +129,18 @@ try:
         hsv = cv2.cvtColor(image_np, cv2.COLOR_BGR2HSV)
                 
         licht = detect_traffic_light(hsv)
-        senCommand(licht)
+        if licht != '11000000':
+            senCommand(licht)
+            print("licht:",licht)
+        time.sleep(0.05)   
+
+        bord = show(image_np)
+        if bord != '11000000':
+            senCommand(bord)
+            print("bord:",bord)
+        time.sleep(0.05)
 
         antwoord = LineDetection(hsv, prev)
-
-                
-        bord = show(image_np)
-        senCommand(bord)
-        print("bord:",bord)
-
         if antwoord == '00000000' or antwoord == '01000000':
             print("bocht")
             temp = antwoord
@@ -153,10 +156,10 @@ try:
             elif tick == 15:
                 flag = 0
                 tick = 0
-        
+        print("send message:" + str(antwoord))
         senCommand(antwoord)   
         
-        time.sleep(0.15)
+        time.sleep(0.05)
            
 except Exception as e:
     print(f"An error occurred: {e}")

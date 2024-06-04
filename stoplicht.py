@@ -16,7 +16,7 @@ def is_surrounded_by_black(image, x, y, w, h, threshold=0.5):
     
     return black_pixels_ratio > threshold
 
-def detect_traffic_light(image, client_socket):
+def detect_traffic_light(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     red_lower1 = np.array([0, 100, 100])
@@ -24,11 +24,11 @@ def detect_traffic_light(image, client_socket):
     red_lower2 = np.array([140, 100, 100])
     red_upper2 = np.array([180, 255, 255])
     
-    yellow_lower = np.array([0, 80, 80])
-    yellow_upper = np.array([30, 255, 255])
+    yellow_lower = np.array([0, 0, 10])
+    yellow_upper = np.array([50, 255, 255])
     
-    green_lower = np.array([50, 80, 80])
-    green_upper = np.array([80, 255, 255])
+    green_lower = np.array([50, 40, 30])
+    green_upper = np.array([100, 255, 255])
 
     mask_red1 = cv2.inRange(hsv, red_lower1, red_upper1)
     mask_red2 = cv2.inRange(hsv, red_lower2, red_upper2)
@@ -64,15 +64,20 @@ def detect_traffic_light(image, client_socket):
         if cv2.contourArea(cnt) > 500:
             x, y, w, h = cv2.boundingRect(cnt)
             aspect_ratio = float(w) / h
-            if 0.8 <= aspect_ratio <= 1.2 and is_surrounded_by_black(image, x, y, w, h):
+            if 0.6 <= aspect_ratio <= 1.4 and is_surrounded_by_black(image, x, y, w, h):
                 #cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)  # Green
                 green = green + 1
                 
 
     if green > orange and green > red:
+        print("green")
         return "11000101"
     elif orange > green and orange > red:
+        print("orange")
         return "11000110"
-    else: 
+    elif red > orange and red > green: 
+        print("red")
         return "11000111"
+    else:  
+        return "11000000"
     

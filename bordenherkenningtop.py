@@ -417,5 +417,4 @@ def show(original_image):
            binair += '0' 
     #print("bin",binair)
     binair += output
-    print("bin",binair)
     return binair    
