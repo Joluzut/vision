@@ -70,9 +70,9 @@ def detect_traffic_light(image, client_socket):
                 
 
     if green > orange and green > red:
-        client_socket.send("green".encode('utf-8'))
+        return "11000101"
     elif orange > green and orange > red:
-        client_socket.send("orange".encode('utf-8'))
+        return "11000110"
     else: 
-        client_socket.send("red".encode('utf-8'))
+        return "11000111"
     
