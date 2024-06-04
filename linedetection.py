@@ -5,7 +5,7 @@ import math
 
 def LineDetection(image, prev):
     # Define the box for cropping (left, upper, right, lower)
-    crop_box = (20, 160, 320, 200)
+    crop_box = (10, 160, 320, 200)
     # Crop the image using the defined box
     cropped_image = Image.fromarray(image).crop(crop_box)
 
@@ -40,42 +40,51 @@ def LineDetection(image, prev):
     flag = 0
     flag1 = 0
     change2 = 0
+    change3 = 0
 
-    for i in range(0, 300):
-        for j in range(0, 40):
+    
+    white_pixel_counts = []
+    biggestline = 0
+    for j in range(0, 40):
+        white_pixels_in_line = 0  # Count white pixels in the current horizontal line
+        for i in range(0, 310):
             if erode2[j][i] == 255:
-                if i < 145:
+                white_pixels_in_line += 1
+                if i < 155:
                     left += 1
                 else:
-                    right += 1
+                   right += 1
                 total += 1
                 sum += i
+                if erode2[0][i] == 255 and flag == 0:
+                    change = i
+                    flag = 1
+                if erode2[20][309-i] == 255 and flag1 == 0:
+                    change1 = 309-i
+                    flag1 = 1
+        if biggestline < white_pixels_in_line:
+            biggestline = white_pixels_in_line
         if erode2[19][i] == 255:
             total2 += 1
         if erode2[20][i] == 255:
             total2 += 1
         if erode2[21][i] == 255:
             total2 += 1
-        if erode2[0][i] == 255 and flag == 0:
-            change = i
-            flag = 1
-        if erode2[20][299-i] == 255 and flag1 == 0:
-            change1 = 299-i
-            flag1 = 1
-
+        if erode2[39][i] == 255 and flag == 0:
+            change3 = i
     if total > 0:
         middle = sum / total
     offset = middle - constmiddle
     overflow = left - right
     change2 = (change + change1) / 2
 
-    if change2 > 165:
-        change2 = change2 - 165
+    if change2 > 155:
+        change2 = change2 - 155
 
-    if change2 < 165:
-        change2 = 165 - change2
+    if change2 < 155:
+        change2 = 155 - change2
 
-    change2 = change2 / 7
+    change2 = change2 / 8
     change2 = math.floor(change2)
     if change2 >= 64:
         change2 = 63
@@ -84,19 +93,28 @@ def LineDetection(image, prev):
     print("change2 " + str(change2))
     print("overflow " + str(overflow))
     print("offset" + str(offset))
+    print("biggest line: " + str(biggestline))
+     
     fixed_binary = bin(change2)[2:].zfill(6)  # Ensure the binary string is zero-padded to 6 bits
 
-    
-    if offset > 15 and -900 < overflow < 900 and offset < 100:
+    if biggestline > 150:
+        print("90")
+        if change3 > 140:
+            print("left")
+            binary = '00000000'
+        else:
+            print("right")
+            binary = '01000000'    
+    elif offset > 20 and -1200 < overflow < 1200 and offset < 100:
         print("rechts 1")
         binary = '01' + fixed_binary
-    elif offset < -15 and -900 < overflow < 900 and offset > -100:
+    elif offset < -20 and -1200 < overflow < 1200 and offset > -100:
         print("links 1")
         binary = '00' + fixed_binary
-    elif overflow < -2000:
+    elif overflow < -1800:
         print("links 2")
         binary = '00' + fixed_binary
-    elif overflow > 1600:
+    elif overflow > 1800:
         print("rechts 2")
         binary = '01' + fixed_binary
     else:

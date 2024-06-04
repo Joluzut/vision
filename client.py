@@ -39,8 +39,10 @@ def receive_image(client_socket):
                 elapsed_time = time.time() - start_time  # Calculate elapsed time
                 if elapsed_time > 0.5:  # If more than 500ms has passed
                     print("Timeout occurred, resending image request.")
-                    client_socket.send("image".encode('utf-8'))  # Resend image request
+                    # client_socket.send("image".encode('utf-8'))  # Resend image request
+                    
                     start_time = time.time()  # Reset the start time
+                    break
 
         return image_data
 
@@ -104,8 +106,9 @@ try:
         image_data = ask_image()
         image = Image.open(io.BytesIO(image_data))  # Open the image from the received data
         
-        filename = f"received_image_{foto}.jpg"
-        
+        filename = f"13received_image_{foto}.jpg"
+        print("image: "+ str(foto))
+        image.save(filename)
         #senCommand("stop")
         # Increment the variable
         foto += 1
@@ -121,24 +124,24 @@ try:
         
         # detect_traffic_light(hsv)
         antwoord = LineDetection(hsv, prev)
-        if antwoord == "tright" or antwoord == "tleft" or antwoord == "cross":
-            temp = antwoord
-            antwoord = prev
-            flag = 1 
 
-        prev = antwoord
+        if antwoord == '00000000' or antwoord == '01000000':
+            print("bocht")
+            temp = antwoord
+            antwoord = '10000000'
+            flag = 1
 
         if flag == 1:
             tick += 1
-            if tick == 30:
+            print("gewoon tick" + str(tick))
+            antwoord = '10000000'
+            if tick == 15:
                 antwoord = temp
+            elif tick == 18:
+                flag = 0
+                tick = 0
         
-        #print(antwoord)
-        senCommand(antwoord)
-        first_two_bits = antwoord[:2]
-        if first_two_bits == '00':
-            print("First two bits are 00")
-            image.save(filename)
+        senCommand(antwoord)   
         
         time.sleep(0.15)
            
