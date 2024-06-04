@@ -38,7 +38,7 @@ def siftstopbord(img):
 
     img3 = cv2.drawMatches(img1, keypoints_1, img2, keypoints_2, matches, img2, flags=2)
     # SIFT matches. increase value if too many false true
-    if(len(matches) > 24):
+    if(len(matches) > 19):
         return 1
     else:
         return 0
@@ -147,7 +147,7 @@ def voorrangvierkant(img,x,y):
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     # Red color
     # Define the color range for detecting yellow
-    yellow_lower = np.array([10, 100, 100])
+    yellow_lower = np.array([9, 100, 100])
     yellow_upper = np.array([30, 255, 255])
 
     # Threshold the HSV image to get only yellow colors
@@ -158,14 +158,14 @@ def voorrangvierkant(img,x,y):
     yellow = cv2.bitwise_and(img, img, mask=mask_yellow)
 
     gray = cv2.cvtColor(yellow, cv2.COLOR_BGR2GRAY)
-    ret,thresh = cv2.threshold(gray,100,255,0)
+    ret,thresh = cv2.threshold(gray,20,255,0)
 
     thresh = cv2.dilate(thresh, kerneldiamond,iterations=2) 
     thresh = cv2.erode(thresh, kerneldiamond,iterations=1) 
 
     yellow = cv2.bitwise_and(img, img, mask=thresh)
 
-    ret,mask = cv2.threshold(gray,230,255,0)
+    ret,mask = cv2.threshold(gray,255,255,0)
     
     cv2.drawContours(mask, [combined], -1, (255,255,255), -1)  # Draw filled contour on mask.
     eindresult = cv2.bitwise_and(yellow,yellow,mask=mask)
@@ -174,7 +174,7 @@ def voorrangvierkant(img,x,y):
     #cv2.waitKey(0)
     
     mean_val = cv2.mean(thresh, mask=mask)[0]  # Mean value of pixels inside the contour
-    if mean_val > 120:
+    if mean_val > 100:
         return 1
     
     return 0
