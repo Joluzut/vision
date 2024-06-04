@@ -308,22 +308,19 @@ def shape_herkenning(img, nrec):
                 if triangleCheck(corner_x,corner_y) == 1:
                     if voorrangdriehoek(cropped_image,corner_x,corner_y) == 1:
                         return 1
-                    else:
-                        print("Geen voorrangsdriehoek")  
+
                 else:
                     print("Geen voorrangsdriehoek")
             if shape == "square":
                     if voorrangvierkant(cropped_image,corner_x,corner_y) == 1:
                         return 2 
-                    else:
-                        print("Geen voorrangsvierkant")  
+
     
             if shape == "circle":
                 if redCircle(cropped_image,w,cX-x_min,cY-y_min) == 1:
                     if siftstopbord(cropped_image) == 1:
                         return 3
-                    else:
-                        print("Geen stopbord")
+
 
             #now you select a circle
 
@@ -346,17 +343,18 @@ def shape_herkenning(img, nrec):
       
     if nrec > 0:
         cv2.destroyAllWindows()
-        shape_herkenning(img_copy , nrec-1)       
-
+        return shape_herkenning(img_copy , nrec-1)       
+    else:
+        return 0
    
     #cv2.imshow("Shapes", img)
     #cv2.waitKey(0)
-    return 0
+    
 
 
 
 def show(original_image):
-
+    '''
     rec = shape_herkenning(original_image,2)
     if  rec == 1:
         print("voorrangsdriehoek")
@@ -366,8 +364,11 @@ def show(original_image):
         print("stopbord")      
     elif rec == 4:
         print("geentoegangbord")
+    
+    '''
 
-    binair = '11' + bin(rec).replace("0b", "")    
+
+    binair = '11' + bin(shape_herkenning(original_image,2)).replace("0b", "")    
     print("bin",binair)
 
     return binair    
