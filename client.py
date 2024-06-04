@@ -1,6 +1,7 @@
 import socket
 from PIL import Image
 from linedetection import LineDetection
+from stoplicht import detect_traffic_light
 import io
 import cv2
 import numpy as np
@@ -126,7 +127,9 @@ try:
         # Convert the image from BGR to HSV
         hsv = cv2.cvtColor(image_np, cv2.COLOR_BGR2HSV)
                 
-        # detect_traffic_light(hsv)
+        licht = detect_traffic_light(hsv)
+        senCommand(licht)
+
         antwoord = LineDetection(hsv, prev)
 
         if antwoord == '00000000' or antwoord == '01000000':
