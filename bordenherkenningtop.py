@@ -104,7 +104,7 @@ def convertRed(img,kernel):
     # Define the color range for detecting red
     red_lower1 = np.array([0, 100, 100])
     red_upper1 = np.array([10, 255, 255])
-    red_lower2 = np.array([160, 100, 100])
+    red_lower2 = np.array([160, 90, 100])
     red_upper2 = np.array([180, 255, 255])
 
     # Threshold the HSV image to get only red colors
@@ -116,7 +116,7 @@ def convertRed(img,kernel):
     mask_red = cv2.erode(mask_red, kernelcircle,iterations=2) 
     red = cv2.bitwise_and(img, img, mask=mask_red)
     gray = cv2.cvtColor(red, cv2.COLOR_BGR2GRAY)
-    ret,thresh = cv2.threshold(gray,50,255,0)
+    ret,thresh = cv2.threshold(gray,25,255,0)
     thresh = cv2.dilate(thresh, kernelcircle,iterations=1) 
     thresh = cv2.erode(thresh, kernelcircle,iterations=1) 
     #cv2.imshow("stop2 thresh",thresh)
