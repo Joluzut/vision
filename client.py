@@ -9,7 +9,7 @@ from io import BytesIO
 import time
 from bordenherkenningtop import show
 
-HOST = '192.168.1.101'  # Address of the server on the local network
+HOST = '192.168.1.100'  # Address of the server on the local network
 PORT = 9090
 
 foto = 0
@@ -17,6 +17,7 @@ prev = ""
 tick = 0
 temp = ""
 flag = 0
+antwoord = 0
 
 def make_socket():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -111,36 +112,39 @@ try:
         image_data = ask_image()
         image = Image.open(io.BytesIO(image_data))  # Open the image from the received data
         
-        filename = f"17received_image_{foto}.jpg"
+        verkeersbord = f"verkeersbord{foto}.jpg"
         print("image: "+ str(foto))
-        image.save(filename)
+        #image.save(filename)
         image.save('afbeelding.jpg')
         #senCommand("stop")
         newimage = cv2.imread('afbeelding.jpg')
         # Increment the variable
-        foto += 1
+        foto += 1   
         
-        image_np = np.array(newimage)
-      
-        # Convert the image from RGB (PIL format) to BGR (OpenCV format)
-        image_np = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
-                
-        # Convert the image from BGR to HSV
-        hsv = cv2.cvtColor(image_np, cv2.COLOR_BGR2HSV)
-                
-        licht = detect_traffic_light(hsv)
-        if licht != '11000000':
-            senCommand(licht)
-            print("licht:",licht)
-        time.sleep(0.05)   
-
-        bord = show(image_np)
+        bord = show(newimage)
+        
         if bord != '11000000':
             senCommand(bord)
             print("bord:",bord)
+            image.save(verkeersbord)
         time.sleep(0.05)
 
-        antwoord = LineDetection(hsv, prev)
+        licht = detect_traffic_light(newimage)
+        if licht != '11000000' and bord == '11000000':
+            senCommand(licht)
+            if licht == '11000101':
+                print("licht: groen")
+                verkeerslicht = f"groen{foto}.jpg"
+            if licht == '11000110':
+                print("licht: oranje")
+                verkeerslicht = f"oranje{foto}.jpg"
+            if licht == '11000111':
+                print("licht: rood")
+                verkeerslicht = f"rood{foto}.jpg"
+            image.save(verkeerslicht)
+        time.sleep(0.05) 
+    	
+        antwoord = LineDetection(newimage, prev)
         if antwoord == '00000000' or antwoord == '01000000':
             print("bocht")
             temp = antwoord

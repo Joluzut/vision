@@ -1,20 +1,31 @@
 import cv2
 import numpy as np
+#function to check if the surrounding pixel around the selected contours are black to signify an trafficlight
+def is_surrounded_by_black(image, x, y, w, h, threshold=0.55):
+    #margin to check around the region
+    margin = 20
 
-def is_surrounded_by_black(image, x, y, w, h, threshold=0.5):
-    margin = 15
+    #calculate the region of interest boundaries
     x_start = max(0, x - margin)
     y_start = max(0, y - margin)
     x_end = min(image.shape[1], x + w + margin)
     y_end = min(image.shape[0], y + h + margin)
     
+    #extract the region of interest
     roi = image[y_start:y_end, x_start:x_end]
+    
+    #convert the ROI to grayscale
     gray_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+    
+    #apply binary inverse threshold to detect black pixels
     _, binary_roi = cv2.threshold(gray_roi, 50, 255, cv2.THRESH_BINARY_INV)
     
+    #calculate the ratio of black pixels in the binary image
     black_pixels_ratio = np.sum(binary_roi == 255) / (binary_roi.size)
     
+    #check if the ratio of black pixels exceeds the threshold
     return black_pixels_ratio > threshold
+
 
 def detect_traffic_light(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -24,11 +35,11 @@ def detect_traffic_light(image):
     red_lower2 = np.array([140, 100, 100])
     red_upper2 = np.array([180, 255, 255])
     
-    yellow_lower = np.array([0, 0, 10])
+    yellow_lower = np.array([0, 40, 30])
     yellow_upper = np.array([50, 255, 255])
     
-    green_lower = np.array([50, 40, 30])
-    green_upper = np.array([100, 255, 255])
+    green_lower = np.array([50, 50, 40])
+    green_upper = np.array([80, 255, 255])
 
     mask_red1 = cv2.inRange(hsv, red_lower1, red_upper1)
     mask_red2 = cv2.inRange(hsv, red_lower2, red_upper2)
@@ -39,26 +50,25 @@ def detect_traffic_light(image):
     contours_red, _ = cv2.findContours(mask_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     contours_yellow, _ = cv2.findContours(mask_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     contours_green, _ = cv2.findContours(mask_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    red = 0
     green = 0
-    orange = 0
+    red = 0
+    yellow = 0
     for cnt in contours_red:
         if cv2.contourArea(cnt) > 500:
             x, y, w, h = cv2.boundingRect(cnt)
             aspect_ratio = float(w) / h
             if 0.8 <= aspect_ratio <= 1.2 and is_surrounded_by_black(image, x, y, w, h):
                 #cv2.rectangle(image, (x, y), (x+w, y+h), (0, 0, 255), 2)  # Red
-                red = red + 1
-                
+                red += 1
+
 
     for cnt in contours_yellow:
         if cv2.contourArea(cnt) > 500:
             x, y, w, h = cv2.boundingRect(cnt)
             aspect_ratio = float(w) / h
             if 0.8 <= aspect_ratio <= 1.2 and is_surrounded_by_black(image, x, y, w, h):
-                #cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 255), 2)  #Orange
-                orange = orange + 1
-                
+                #cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 255), 2)  # 
+                yellow += 1
 
     for cnt in contours_green:
         if cv2.contourArea(cnt) > 500:
@@ -66,17 +76,17 @@ def detect_traffic_light(image):
             aspect_ratio = float(w) / h
             if 0.6 <= aspect_ratio <= 1.4 and is_surrounded_by_black(image, x, y, w, h):
                 #cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)  # Green
-                green = green + 1
-                
+                green += 1
 
-    if green > orange and green > red:
-        print("green")
+    print("groen" + str(green))
+    print("rood" + str(red))
+    print("geel" + str(yellow))          
+    #which colors has the most counts gets send back
+    if green >= 1:
         return "11000101"
-    elif orange > green and orange > red:
-        print("orange")
+    elif yellow >= 1:
         return "11000110"
-    elif red > orange and red > green: 
-        print("red")
+    elif red >= 1: 
         return "11000111"
     else:  
         return "11000000"
