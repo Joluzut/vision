@@ -78,53 +78,64 @@ def LineDetection(image, prev):
         middle = sum / total#calculate the middle
     offset = middle - constmiddle#to get the offset from the average middle
     overflow = left - right#if there are more pixel left overflow is positive else negative
-    change2 = (change + change1) / 2
+    change2 = (change + change1) / 2#calculate the middle of the two first white pixels
 
+    #to compenstate for the offset
     if change2 > 140:
         change2 = change2 - 140
 
     if change2 < 140:
         change2 = 140 - change2
 
+    #to get the right value for the binary
     change2 = change2 / 6
     change2 = math.floor(change2)
+
+    #to make sure the binary is between 1 and 63
     if change2 >= 64:
         change2 = 63
     if change2 <= 0:
         change2 = 1
-    print("change2 " + str(change2))
-    print("overflow " + str(overflow))
-    print("offset" + str(offset))
-    print("biggest line: " + str(biggestline))
-    print("change3 " + str(change3))
-    print("test" + str(temp))
-    fixed_binary = bin(change2)[2:].zfill(6)  # Ensure the binary string is zero-padded to 6 bits
 
+    #print("change2 " + str(change2))
+    #print("overflow " + str(overflow))
+    #print("offset" + str(offset))
+    #print("biggest line: " + str(biggestline))
+    #print("change3 " + str(change3))
+    #print("test" + str(temp))
+
+    #to make sure the binary is 6 bits
+    fixed_binary = bin(change2)[2:].zfill(6)
+
+    #for left and right 90 degree turns
     if biggestline > 170:
         print("90")
+        #prioritize the right turn
         if change3 > 110:
             print("left")
             binary = '00000000'
         else:
             print("right")
-            binary = '01000000'  
+            binary = '01000000' 
+    #for turns based on the offset with right priority 
     elif offset > 15:
         print("rechts 1")
         binary = '01' + fixed_binary
-    elif offset < -15:
+    elif offset < -20:
         print("links 1")
         binary = '00' + fixed_binary
-    elif overflow < -300:
+    #for turns based on the overflow with right priority
+    elif overflow < -500:
         print("links 2")
         binary = '00' + fixed_binary
     elif overflow > 300:
         print("rechts 2")
         binary = '01' + fixed_binary  
-
+    #for straight lines
     else:
         print("rechtdoor")
         binary = '10' + fixed_binary
-    print(binary)
+    #print(binary)
     #cv2.imshow('image', erode2)
     return binary
 

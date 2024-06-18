@@ -9,7 +9,7 @@ from io import BytesIO
 import time
 from bordenherkenningtop import show
 
-HOST = '192.168.1.100'  # Address of the server on the local network
+HOST = '192.168.1.101'  # Address of the server on the local network
 PORT = 9090
 
 foto = 0
@@ -113,25 +113,33 @@ try:
         image = Image.open(io.BytesIO(image_data))  # Open the image from the received data
         
         verkeersbord = f"verkeersbord{foto}.jpg"
-        print("image: "+ str(foto))
-        #image.save(filename)
+
+        # Save the image to a file and read it again
         image.save('afbeelding.jpg')
-        #senCommand("stop")
         newimage = cv2.imread('afbeelding.jpg')
+
         # Increment the variable
         foto += 1   
         
+        #traffic sign detection
         bord = show(newimage)
         
+        #if traffic sign is detected send the command
         if bord != '11000000':
             senCommand(bord)
             print("bord:",bord)
+            # Save the image with the detected traffic sign for debugging
             image.save(verkeersbord)
         time.sleep(0.05)
 
+        #traffic light detection
         licht = detect_traffic_light(newimage)
+
+        #if traffic light is detected send the command
+        #only works if there is no traffic sign detected
         if licht != '11000000' and bord == '11000000':
             senCommand(licht)
+            # Save the image with the detected traffic light for debugging based on the color
             if licht == '11000101':
                 print("licht: groen")
                 verkeerslicht = f"groen{foto}.jpg"
@@ -144,23 +152,39 @@ try:
             image.save(verkeerslicht)
         time.sleep(0.05) 
     	
+        #line detection
         antwoord = LineDetection(newimage, prev)
+
+        #if the line detection is a turn
         if antwoord == '00000000' or antwoord == '01000000':
             print("bocht")
+            #save the 90 degree turn for later use
             temp = antwoord
-            antwoord = '10000001'
+
+            #send the command to go straight
+            antwoord = '10010101'
+
+            #flag to check if the 90 degree turn is send
             flag = 1
 
+        #if there is an upcomming 90 degree turn
         if flag == 1:
+            #tick to make sure the 90 degree turn is send after 12 ticks
             tick += 1
             print("gewoon tick" + str(tick))
-            antwoord = '10000001'
+            antwoord = '10010101'
             if tick == 12:
                 antwoord = temp
+            #go a while straight after the 90 degree turn
             elif tick == 15:
                 flag = 0
                 tick = 0
         print("send message:" + str(antwoord))
+
+        #the first command is always to go straight to prevent inconsistencies
+        if(foto <= 5):
+            antwoord = '10010101'
+
         senCommand(antwoord)   
         
         time.sleep(0.05)
