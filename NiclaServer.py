@@ -89,7 +89,7 @@ while True:
 
         else:
             check_zero_one(message) #send message to zumo
-            time.sleep_us(2)
+            time.sleep_us(100)
 
     except Exception as e:
         print(f"Exception: {e}") #print exception
